@@ -3,8 +3,8 @@ statistics.py — 统计检验函数
 
 包含：
   - 独立样本 t 检验（性别 vs 消费金额）
-  - 单因素 ANOVA（年级 vs 消费金额）
-  - 单因素 ANOVA（生源地区域 vs 消费金额）
+  - 单因素 方差分析（年级 vs 消费金额）
+  - 单因素 方差分析（生源地区域 vs 消费金额）
 
 所有检验使用 alpha = 0.05
 """
@@ -74,9 +74,9 @@ def ttest_gender_consumption(df: pd.DataFrame) -> dict:
     }
 
 
-def anova_grade_consumption(df: pd.DataFrame) -> dict:
+def 方差分析_grade_consumption(df: pd.DataFrame) -> dict:
     """
-    单因素 ANOVA：不同年级每餐消费金额差异。
+    单因素 方差分析：不同年级每餐消费金额差异。
 
     H0: 各年级均值相等
     H1: 至少有一组均值不等
@@ -86,7 +86,7 @@ def anova_grade_consumption(df: pd.DataFrame) -> dict:
     dict
         检验结果字典。
     """
-    _print_section("方法二：单因素 ANOVA — 不同年级每餐消费金额差异")
+    _print_section("方法二：单因素 方差分析 — 不同年级每餐消费金额差异")
 
     col = "per_meal_cost_num"
     grade_order = ["大一", "大二", "大三", "大四及以上"]
@@ -103,33 +103,33 @@ def anova_grade_consumption(df: pd.DataFrame) -> dict:
         print("  [跳过] 年级分组不足")
         return {}
 
-    # ANOVA
-    f_stat, anova_p = f_oneway(*groups)
-    print(f"  ANOVA: F={f_stat:.4f}, p={anova_p:.4f}")
+    # 方差分析
+    f_stat, 方差分析_p = f_oneway(*groups)
+    print(f"  方差分析: F={f_stat:.4f}, p={方差分析_p:.4f}")
 
     result = {
-        "method": "单因素 ANOVA（年级）",
+        "method": "单因素 方差分析（年级）",
         "groups": group_names,
         "ns": [len(g) for g in groups],
         "means": [g.mean() for g in groups],
         "stds": [g.std() for g in groups],
-        "f_stat": f_stat, "anova_p": anova_p,
-        "significant": anova_p < ALPHA,
+        "f_stat": f_stat, "方差分析_p": 方差分析_p,
+        "significant": 方差分析_p < ALPHA,
     }
 
-    if anova_p < ALPHA:
-        print(f"  结论: p={anova_p:.4f} < {ALPHA}, 拒绝 H0，不同年级每餐消费金额有显著差异。")
+    if 方差分析_p < ALPHA:
+        print(f"  结论: p={方差分析_p:.4f} < {ALPHA}, 拒绝 H0，不同年级每餐消费金额有显著差异。")
         # Tukey HSD 事后检验
         result.update(_tukey_hsd(groups, group_names))
     else:
-        print(f"  结论: p={anova_p:.4f} >= {ALPHA}, 不拒绝 H0，不同年级每餐消费金额无显著差异。")
+        print(f"  结论: p={方差分析_p:.4f} >= {ALPHA}, 不拒绝 H0，不同年级每餐消费金额无显著差异。")
 
     return result
 
 
-def anova_region_consumption(df: pd.DataFrame) -> dict:
+def 方差分析_region_consumption(df: pd.DataFrame) -> dict:
     """
-    单因素 ANOVA：不同生源地区域每餐消费金额差异。
+    单因素 方差分析：不同生源地区域每餐消费金额差异。
 
     H0: 各区域均值相等
     H1: 至少有一组均值不等
@@ -139,7 +139,7 @@ def anova_region_consumption(df: pd.DataFrame) -> dict:
     dict
         检验结果字典。
     """
-    _print_section("方法三：单因素 ANOVA — 不同生源地区域每餐消费金额差异")
+    _print_section("方法三：单因素 方差分析 — 不同生源地区域每餐消费金额差异")
 
     col = "per_meal_cost_num"
     region_order = ["上海本地", "东部地区", "中部地区", "西部地区"]
@@ -156,25 +156,25 @@ def anova_region_consumption(df: pd.DataFrame) -> dict:
         print("  [跳过] 区域分组不足")
         return {}
 
-    # ANOVA
-    f_stat, anova_p = f_oneway(*groups)
-    print(f"  ANOVA: F={f_stat:.4f}, p={anova_p:.4f}")
+    # 方差分析
+    f_stat, 方差分析_p = f_oneway(*groups)
+    print(f"  方差分析: F={f_stat:.4f}, p={方差分析_p:.4f}")
 
     result = {
-        "method": "单因素 ANOVA（生源地区域）",
+        "method": "单因素 方差分析（生源地区域）",
         "groups": group_names,
         "ns": [len(g) for g in groups],
         "means": [g.mean() for g in groups],
         "stds": [g.std() for g in groups],
-        "f_stat": f_stat, "anova_p": anova_p,
-        "significant": anova_p < ALPHA,
+        "f_stat": f_stat, "方差分析_p": 方差分析_p,
+        "significant": 方差分析_p < ALPHA,
     }
 
-    if anova_p < ALPHA:
-        print(f"  结论: p={anova_p:.4f} < {ALPHA}, 拒绝 H0，不同生源地区域每餐消费金额有显著差异。")
+    if 方差分析_p < ALPHA:
+        print(f"  结论: p={方差分析_p:.4f} < {ALPHA}, 拒绝 H0，不同生源地区域每餐消费金额有显著差异。")
         result.update(_tukey_hsd(groups, group_names))
     else:
-        print(f"  结论: p={anova_p:.4f} >= {ALPHA}, 不拒绝 H0，不同生源地区域每餐消费金额无显著差异。")
+        print(f"  结论: p={方差分析_p:.4f} >= {ALPHA}, 不拒绝 H0，不同生源地区域每餐消费金额无显著差异。")
 
     return result
 
@@ -236,8 +236,8 @@ def run_all_statistics(df: pd.DataFrame) -> None:
 
     results = {}
     results["ttest_gender"] = ttest_gender_consumption(df)
-    results["anova_grade"] = anova_grade_consumption(df)
-    results["anova_region"] = anova_region_consumption(df)
+    results["方差分析_grade"] = 方差分析_grade_consumption(df)
+    results["方差分析_region"] = 方差分析_region_consumption(df)
 
     # 打印汇总
     _print_section("统计检验结果汇总")
@@ -249,7 +249,7 @@ def run_all_statistics(df: pd.DataFrame) -> None:
             print(f"  {method}: t={res['t_stat']:.4f}, p={res['t_p']:.4f} "
                   f"({'显著' if res['significant'] else '不显著'})")
         elif "f_stat" in res:
-            print(f"  {method}: F={res['f_stat']:.4f}, p={res['anova_p']:.4f} "
+            print(f"  {method}: F={res['f_stat']:.4f}, p={res['方差分析_p']:.4f} "
                   f"({'显著' if res['significant'] else '不显著'})")
 
     # 保存结果到文本文件
