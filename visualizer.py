@@ -9,7 +9,7 @@ visualizer.py — matplotlib 图表生成
   图5: 食堂就餐时段偏好柱状图（多选题统计）
   图6: 菜品类型偏好饼图（多选题统计）
   图7: 月生活费区间柱状图
-  图8: 李克特量表满意度均值 ± SE 柱状图
+  图8: 量表满意度均值 ± SE 柱状图
 """
 
 import os
@@ -308,15 +308,15 @@ def plot_living_expense_bar(df: pd.DataFrame, output_dir: str = OUTPUT_DIR):
 
 
 # ============================================================
-# 图8: 李克特量表满意度均值 ± SE 柱状图
+# 图8: 量表满意度均值 ± SE 柱状图
 # ============================================================
 def plot_likert_bar(df: pd.DataFrame, output_dir: str = OUTPUT_DIR):
-    """Q13-Q20 李克特量表各维度满意度均值 ± 标准误"""
+    """Q13-Q20 量表各维度满意度均值 ± 标准误"""
     likert_num_cols = [c + "_num" for c in LIKERT_COLS]
     available = [c for c in likert_num_cols if c in df.columns]
 
     if len(available) == 0:
-        print("[visualizer] 跳过图8: 无李克特数值列")
+        print("[visualizer] 跳过图8: 无数值列")
         return
 
     means = []
@@ -349,7 +349,7 @@ def plot_likert_bar(df: pd.DataFrame, output_dir: str = OUTPUT_DIR):
     ax.set_xticks(x)
     ax.set_xticklabels(labels, rotation=25, fontsize=10)
     ax.set_ylabel("满意度均值 (1-5)", fontsize=12)
-    ax.set_title("图8 食堂各维度满意度均值 ± SE（李克特5级量表）", fontsize=14)
+    ax.set_title("图8 食堂各维度满意度均值 ± SE（5级量表）", fontsize=14)
     ax.set_ylim(1, 5.5)
     ax.axhline(y=3, color="gray", linestyle="--", linewidth=1, alpha=0.5, label="中立=3")
     ax.legend(loc="lower right")

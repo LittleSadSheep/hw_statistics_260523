@@ -1,4 +1,3 @@
-"""临时脚本：提取清洗后数据的完整描述性统计（修复多选统计）"""
 import pandas as pd
 import numpy as np
 from data_cleaner import clean_survey_data
@@ -68,7 +67,7 @@ desc2 = df["living_expense_num"].describe()
 w(f"  N={desc2['count']:.0f}, Mean={desc2['mean']:.2f}, Std={desc2['std']:.2f}")
 w(f"  Min={desc2['min']:.2f}, Q1={desc2['25%']:.2f}, Median={desc2['50%']:.2f}, Q3={desc2['75%']:.2f}, Max={desc2['max']:.2f}")
 
-w("\n--- 11) 李克特量表满意度描述统计 ---")
+w("\n--- 11) 量表满意度描述统计 ---")
 likert_cols = ["sat_taste", "sat_price", "sat_freshness", "sat_health",
                "sat_service", "sat_env", "sat_waiting", "sat_variety"]
 likert_labels = ["菜品口味", "价格合理性", "新鲜度与卫生", "营养健康",

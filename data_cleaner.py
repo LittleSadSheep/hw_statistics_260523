@@ -8,7 +8,7 @@ data_cleaner.py — 数据清洗与转换
   4. 映射生源地代码 → 区域分类
   5. 消费金额区间 → 数值中点
   6. 生活费区间 → 数值中点
-  7. 李克特量表 → 1-5 数值
+  7. 量表 → 1-5 数值
   8. 多选题展开统计（meal_periods, dish_types, pref_price_range）
   9. IQR 异常值检测
 """
@@ -50,11 +50,11 @@ def clean_survey_data(df_raw: pd.DataFrame) -> pd.DataFrame:
     # ---- 步骤1: 删除元数据列 ----
     cols_to_drop = [c for c in META_COLS if c in df.columns]
     df.drop(columns=cols_to_drop, inplace=True, errors="ignore")
-    print(f"[cleaner] 步骤1: 删除了 {len(cols_to_drop)} 个元数据列")
+    print(f"1: 删除了 {len(cols_to_drop)} 个元数据列")
 
     # ---- 步骤2: 重命名列 ----
     df.rename(columns=COLUMN_RENAME, inplace=True)
-    print(f"[cleaner] 步骤2: 列重命名完成 ({len(COLUMN_RENAME)} 列)")
+    print(f"2: 列重命名完成 ({len(COLUMN_RENAME)} 列)")
 
     # ---- 步骤3: 去除单选题/量表题文本的前缀 ----
     prefix_strip_cols = [
@@ -65,14 +65,14 @@ def clean_survey_data(df_raw: pd.DataFrame) -> pd.DataFrame:
     for col in prefix_strip_cols:
         if col in df.columns:
             df[col] = df[col].apply(strip_option_prefix)
-    print(f"[cleaner] 步骤3: 去除了 {len(prefix_strip_cols)} 列的前缀")
+    print(f"3: 去除了 {len(prefix_strip_cols)} 列的前缀")
 
     # ---- 步骤3b: 文本标准化（统一 en-dash 和 空格） ----
     range_cols = ["per_meal_cost", "living_expense"]
     for col in range_cols:
         if col in df.columns:
             df[col] = df[col].apply(_normalize_range_text)
-    print(f"[cleaner] 步骤3b: 文本标准化完成")
+    print(f"3b: 文本标准化完成")
 
     # ---- 步骤4: 映射生源地代码 → 省份名 + 区域 ----
     if "hometown_code" in df.columns:
@@ -89,7 +89,7 @@ def clean_survey_data(df_raw: pd.DataFrame) -> pd.DataFrame:
         ].unique()
         if len(unmapped) > 0:
             print(f"  [警告] 未映射的生源地代码: {list(unmapped)}")
-        print(f"[cleaner] 步骤4: 生源地代码 → 省份 + 区域映射完成")
+        print(f"4: 生源地代码 → 省份 + 区域映射完成")
 
     # ---- 步骤5: 消费金额区间 → 数值中点 ----
     if "per_meal_cost" in df.columns:
@@ -97,7 +97,7 @@ def clean_survey_data(df_raw: pd.DataFrame) -> pd.DataFrame:
         unmapped_cost = df[df["per_meal_cost_num"].isna()]["per_meal_cost"].unique()
         if len(unmapped_cost) > 0:
             print(f"  [警告] 未映射的消费区间: {list(unmapped_cost)}")
-        print(f"[cleaner] 步骤5: 消费金额区间 → 数值中点 (有效值: {df['per_meal_cost_num'].notna().sum()})")
+        print(f"5: 消费金额区间 → 数值中点 (有效值: {df['per_meal_cost_num'].notna().sum()})")
 
     # ---- 步骤6: 生活费区间 → 数值中点 ----
     if "living_expense" in df.columns:
@@ -105,19 +105,19 @@ def clean_survey_data(df_raw: pd.DataFrame) -> pd.DataFrame:
         unmapped_le = df[df["living_expense_num"].isna()]["living_expense"].unique()
         if len(unmapped_le) > 0:
             print(f"  [警告] 未映射的生活费区间: {list(unmapped_le)}")
-        print(f"[cleaner] 步骤6: 生活费区间 → 数值中点 (有效值: {df['living_expense_num'].notna().sum()})")
+        print(f"6: 生活费区间 → 数值中点 (有效值: {df['living_expense_num'].notna().sum()})")
 
-    # ---- 步骤7: 李克特量表 → 1-5 数值 ----
+    # ---- 步骤7: 量表 → 1-5 数值 ----
     for col in LIKERT_COLS:
         if col in df.columns:
             df[col + "_num"] = df[col].map(LIKERT_MAP)
-    print(f"[cleaner] 步骤7: 李克特量表 {len(LIKERT_COLS)} 列 → 数值完成")
+    print(f"7: 量表 {len(LIKERT_COLS)} 列 → 数值完成")
 
     # ---- 步骤8: 多选题展开统计 ----
     for col in MULTI_SELECT_COLS:
         if col in df.columns:
             df = _expand_multi_select(df, col)
-    print(f"[cleaner] 步骤8: 多选题展开统计完成 ({len(MULTI_SELECT_COLS)} 列)")
+    print(f"8: 多选题展开统计完成 ({len(MULTI_SELECT_COLS)} 列)")
 
     # ---- 步骤9: IQR 异常值检测 ----
     if "per_meal_cost_num" in df.columns:
@@ -128,7 +128,7 @@ def clean_survey_data(df_raw: pd.DataFrame) -> pd.DataFrame:
         upper = Q3 + 1.5 * IQR
         df["is_outlier"] = (df["per_meal_cost_num"] < lower) | (df["per_meal_cost_num"] > upper)
         n_outliers = df["is_outlier"].sum()
-        print(f"[cleaner] 步骤9: IQR异常值检测 Q1={Q1:.2f}, Q3={Q3:.2f}, IQR={IQR:.2f}")
+        print(f"9: IQR异常值检测 Q1={Q1:.2f}, Q3={Q3:.2f}, IQR={IQR:.2f}")
         print(f"  异常范围: <{lower:.2f} 或 >{upper:.2f}, 异常样本: {n_outliers} ({100*n_outliers/len(df):.1f}%)")
 
     # ---- 步骤10: 检查缺失值 ----
